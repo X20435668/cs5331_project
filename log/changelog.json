@@ -1,0 +1,37 @@
+{
+    "id": "just randome id",
+    "current_change_id":"uuid of recently applied cahnge",
+    "description":"This is a append only file, all the chagnes will be recorded and never deleted",
+    "changelog": [        
+        {
+            "action":"rollback",
+            "change_id": "some uuid",
+            "package_name": "/path/to/zip/file",
+            "files_to_update": [
+                {
+                    "src": "",
+                    "dst": "",
+                    "permission": "",
+                    "user_id": "",
+                    "group_id": ""
+                }
+            ],
+            "back_up_dir": "/path/to/our/backup/dir"
+        },
+        {
+            "action":"apply",
+            "change_id": "some uuid",
+            "package_name": "/path/to/zip/file",
+            "files_to_update": [
+                {
+                    "src": "",
+                    "dst": "",
+                    "permission": "",
+                    "user_id": "",
+                    "group_id": ""
+                }
+            ],
+            "back_up_dir": "/path/to/our/backup/dir"
+        }
+    ]
+}

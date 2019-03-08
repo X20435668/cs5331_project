@@ -1,0 +1,14 @@
+{
+    "update_id":"some uuid",
+    "package_name":"/path/to/zip/file",
+    "files_to_update":[
+        {
+            "src":"",
+            "dst":"",
+            "permission":"",
+            "user_id":"",
+            "group_id":""
+        }
+    ],
+    "back_up_dir":"/path/to/our/backup/dir"
+}
