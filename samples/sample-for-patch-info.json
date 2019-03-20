@@ -9,6 +9,5 @@
             "user_id":"",
             "group_id":""
         }
-    ],
-    "back_up_dir":"/path/to/our/backup/dir"
+    ]    
 }
