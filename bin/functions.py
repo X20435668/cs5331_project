@@ -3,8 +3,9 @@ import logging
 import logging.handlers as handlers
 import os
 import os.path as path
-from . import utils
-from . import models
+import utils
+import models
+import json
 
 logger = None
 changelog = None
@@ -50,41 +51,54 @@ def roll_back(change):
     """
     roll back the previous change
     """
-    can_perform_change = changelog.can_roll_back(change)
-    if not can_perform_change:
-        return
-    _roll_back(change)
+    if changelog.can_roll_back(change):     
+        _roll_back(change)
+        changelog.apply_change(change)
 
+def _roll_back(change):
 
-def _roll_back(update_id):
-    
     pass
 
 
-def install_update(args):
+def install_update(change):
     """
     install updates
     """
-    pass
+    change['action']='apply'
+    if changelog.appliable(change):
+        __install_udpate(change)
+        changelog.apply_change(change)
+    
 
+def __install_udpate(change):
+    pass
 
 def print_manual():
     print("This is print manual")
-    pass
+    print(changelog.can_roll_back(patch_info.patch[0]))
 
 
-def load_change_log():
-    pass
+def load_change_log(file):
+    changelog = models.ChangeLog(file)
+    return changelog
 
 
-def get_patch_info():
-    pass
-
+# TODO: To be changed to S3 Later
+def get_patch_info(cur_dir):
+    path_file = os.path.join(
+        cur_dir, '../samples/sample-for-patch-info.json')
+    with open(path_file, 'r') as f:
+        content = f.read()
+    data = json.loads(content)
+    patch_info = models.PatchInfo(data)
+    return patch_info
 
 if __name__ == "__main__":
+    cur_dir = os.path.dirname(__file__)
     logger = setup_log()
-    load_change_log()
-    get_patch_info()
+    changelog = load_change_log(os.path.join(cur_dir, '../log/changelog.json'))
+    patch_info = get_patch_info(cur_dir)
+
     if len(sys.argv) < 2:
         print_manual()
     elif sys.argv[1] == 'list':

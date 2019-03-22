@@ -1,13 +1,17 @@
-[{
-    "update_id": "some uuid",
-    "description": "",
-    "application": "",
-    "package_name": "/path/to/zip/file",
-    "files_to_update": [{
-        "src": "",
-        "dst": "",
-        "permission": "",
-        "user_id": "",
-        "group_id": ""
-    }]
-}]
+[
+    {
+        "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+        "description": "",
+        "application": "app2",
+        "package_name": "/path/to/zip/file",
+        "files_to_update": [
+            {
+                "src": "",
+                "dst": "",
+                "permission": "",
+                "user_id": "",
+                "group_id": ""
+            }
+        ]
+    }
+]

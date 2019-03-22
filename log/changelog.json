@@ -4,10 +4,27 @@
     "description":"This is a append only file, all the chagnes will be recorded and never deleted",
     "changelog": [        
         {
+            "action":"apply",
+            "change_id": "apply-f5b30ed9-1889-4be4-a09b-e1c198924f09",
+            "update_id":"f5b30ed9-1889-4be4-a09b-e1c198924f09",
+            "application":"app1",
+            "package_name": "/path/to/zip/file",
+            "files_to_update": [
+                {
+                    "src": "",
+                    "dst": "",
+                    "permission": "",
+                    "user_id": "",
+                    "group_id": ""
+                }
+            ],
+            "back_up_file": "/path/to/backup/file/of/changed/file"
+        },
+        {
             "action":"rollback",
-            "change_id": "rollback_uuid",
-            "update_id": "uuid",
-            "application":"",
+            "change_id": "rollback-f5b30ed9-1889-4be4-a09b-e1c198924f09",
+            "update_id": "f5b30ed9-1889-4be4-a09b-e1c198924f09",
+            "application":"app1",
             "package_name": "/path/to/zip/file",
             "files_to_update": [
                 {
@@ -22,9 +39,9 @@
         },
         {
             "action":"apply",
-            "change_id": "apply_uuid",
-            "update_id":"uuid",
-            "application":"",
+            "change_id": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+            "update_id":"ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+            "application":"app2",
             "package_name": "/path/to/zip/file",
             "files_to_update": [
                 {
