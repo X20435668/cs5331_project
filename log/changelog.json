@@ -5,7 +5,9 @@
     "changelog": [        
         {
             "action":"rollback",
-            "change_id": "some uuid",
+            "change_id": "rollback_uuid",
+            "update_id": "uuid",
+            "application":"",
             "package_name": "/path/to/zip/file",
             "files_to_update": [
                 {
@@ -16,11 +18,13 @@
                     "group_id": ""
                 }
             ],
-            "back_up_dir": "/path/to/our/backup/dir"
+            "back_up_file": "/path/to/backup/file/of/changed/file"
         },
         {
             "action":"apply",
-            "change_id": "some uuid",
+            "change_id": "apply_uuid",
+            "update_id":"uuid",
+            "application":"",
             "package_name": "/path/to/zip/file",
             "files_to_update": [
                 {
@@ -31,7 +35,7 @@
                     "group_id": ""
                 }
             ],
-            "back_up_dir": "/path/to/our/backup/dir"
+            "back_up_file": "/path/to/backup/file/of/changed/file"
         }
     ]
 }

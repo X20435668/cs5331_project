@@ -1,13 +1,13 @@
-{
-    "update_id":"some uuid",
-    "package_name":"/path/to/zip/file",
-    "files_to_update":[
-        {
-            "src":"",
-            "dst":"",
-            "permission":"",
-            "user_id":"",
-            "group_id":""
-        }
-    ]    
-}
+[{
+    "update_id": "some uuid",
+    "description": "",
+    "application": "",
+    "package_name": "/path/to/zip/file",
+    "files_to_update": [{
+        "src": "",
+        "dst": "",
+        "permission": "",
+        "user_id": "",
+        "group_id": ""
+    }]
+}]
