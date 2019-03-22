@@ -10,10 +10,11 @@ import json
 logger = None
 changelog = None
 patch_info = None
+settings = None
 
 
 def setup_log():
-    logger = logging.getLogger('telegram-bot')
+    logger = logging.getLogger('updater')
     logger.setLevel(logging.DEBUG)
     log_dir = "../log"
     if (not path.exists(log_dir)) or (not path.isdir(log_dir)):
@@ -51,11 +52,16 @@ def roll_back(change):
     """
     roll back the previous change
     """
-    if changelog.can_roll_back(change):     
+    if changelog.can_roll_back(change):
         _roll_back(change)
         changelog.apply_change(change)
 
+
 def _roll_back(change):
+    files_to_zip = []
+    for up in change['files_to_update']:
+        files_to_zip.append(up['dst'])
+    utils.zip_files(change['change_id'], settings['backup_dir'], files_to_zip)
 
     pass
 
@@ -64,14 +70,15 @@ def install_update(change):
     """
     install updates
     """
-    change['action']='apply'
+    change['action'] = 'apply'
     if changelog.appliable(change):
         __install_udpate(change)
         changelog.apply_change(change)
-    
+
 
 def __install_udpate(change):
     pass
+
 
 def print_manual():
     print("This is print manual")
@@ -93,8 +100,12 @@ def get_patch_info(cur_dir):
     patch_info = models.PatchInfo(data)
     return patch_info
 
+
 if __name__ == "__main__":
     cur_dir = os.path.dirname(__file__)
+    with open(os.path.join(cur_dir, 'settings.json'), 'r') as f:
+        content = f.read()
+    settings = json.loads(content)
     logger = setup_log()
     changelog = load_change_log(os.path.join(cur_dir, '../log/changelog.json'))
     patch_info = get_patch_info(cur_dir)
