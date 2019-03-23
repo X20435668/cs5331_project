@@ -6,6 +6,9 @@ import os.path as path
 import utils
 import models
 import json
+from bin.listUpdate.listUpdate import UpdateLister
+import pprint
+import argparse
 
 logger = None
 changelog = None
@@ -21,11 +24,11 @@ def setup_log():
         os.mkdir(log_dir)
     # create file handler that logs debug and higher level messages
     fh = handlers.RotatingFileHandler(
-        path.join(log_dir, 'activity.log'), maxBytes=20*1024*1024, backupCount=5)
+        path.join(log_dir, 'activity.log'), maxBytes=20 * 1024 * 1024, backupCount=5)
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = handlers.RotatingFileHandler(
-        path.join(log_dir, 'error.log'), maxBytes=20*1024*1024, backupCount=5)
+        path.join(log_dir, 'error.log'), maxBytes=20 * 1024 * 1024, backupCount=5)
     ch.setLevel(logging.ERROR)
     # create formatter and add it to the handlers
     ih = logging.StreamHandler()
@@ -45,7 +48,15 @@ def list_updates(args):
     """
     List updates available
     """
-    pass
+    ul = UpdateLister()
+    if len(args) == 0:
+        packages = ul.list_all()
+        pp = pprint.PrettyPrinter(width=1)
+        pp.pprint(packages)
+    else:
+        if args.filename:
+            ul.list_package_by_name(args.filename)
+
 
 
 def roll_back(change):
@@ -110,13 +121,25 @@ if __name__ == "__main__":
     changelog = load_change_log(os.path.join(cur_dir, '../log/changelog.json'))
     patch_info = get_patch_info(cur_dir)
 
-    if len(sys.argv) < 2:
+    parser = argparse.ArgumentParser(description='Rollback updater')
+    parser.add_argument('-l', '--list',
+                        help='list files can be updated')
+    parser.add_argument('-r', '--rollback',
+                        help='roll back files')
+    parser.add_argument('-i', '--install',
+                        help='install files files')
+    parser.add_argument('-m', '--manual',
+                        help='print manual')
+
+    arguments = parser.parse_args()
+
+    if len(sys.argv) < 2 or arguments.manual:
         print_manual()
-    elif sys.argv[1] == 'list':
-        list_updates(sys.argv[2:])
-    elif sys.argv[1] == 'rollback':
-        roll_back(sys.argv[2:])
-    elif sys.argv[1] == 'install':
-        install_update(sys.argv[2:])
+    elif arguments.list:
+        list_updates(arguments.list)
+    elif arguments.rollback:
+        roll_back(arguments.rollback)
+    elif arguments.install:
+        install_update(arguments.install)
     else:
         print_manual()

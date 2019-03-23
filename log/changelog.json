@@ -1,7 +1,7 @@
 {
-    "id": "just randome id",
-    "current_change_id":"uuid of recently applied cahnge",
-    "description":"This is a append only file, all the chagnes will be recorded and never deleted",
+    "id": "just random id",
+    "current_change_id":"uuid of recently applied change",
+    "description":"This is a append only file, all the changes will be recorded and never deleted",
     "changelog": [        
         {
             "action":"apply",
