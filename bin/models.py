@@ -47,6 +47,14 @@ class ChangeLog(object):
         orderred_dict = self.result_changelog[application_name]
         return change['update_id'] not in orderred_dict
 
+    def get_change(self, update_id):
+        change = None
+        for _, value in self.result_changelog.items():
+            if update_id in value:
+                change = value[update_id]
+                break
+        return change
+
     def get_not_applied_patch(self, patch_info_list):
         pass
 

@@ -1,5 +1,6 @@
 {
     "server_list":[],
     "release_file":"patch-info.json",
-    "back_up_dir":"../backup"
+    "back_up_dir":"../backup",
+    "download_dir":"/tmp"
 }
