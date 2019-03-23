@@ -1,58 +1,86 @@
 {
-    "id": "just random id",
-    "current_change_id":"uuid of recently applied change",
-    "description":"This is a append only file, all the changes will be recorded and never deleted",
-    "changelog": [        
+    "changelog": [
         {
-            "action":"apply",
+            "action": "apply",
+            "application": "app1",
+            "back_up_file": "/path/to/backup/file/of/changed/file",
             "change_id": "apply-f5b30ed9-1889-4be4-a09b-e1c198924f09",
-            "update_id":"f5b30ed9-1889-4be4-a09b-e1c198924f09",
-            "application":"app1",
-            "package_name": "/path/to/zip/file",
             "files_to_update": [
                 {
-                    "src": "",
                     "dst": "",
+                    "group_id": "",
                     "permission": "",
-                    "user_id": "",
-                    "group_id": ""
+                    "src": "",
+                    "user_id": ""
                 }
             ],
-            "back_up_file": "/path/to/backup/file/of/changed/file"
+            "package_name": "/path/to/zip/file",
+            "update_id": "f5b30ed9-1889-4be4-a09b-e1c198924f09"
         },
         {
-            "action":"rollback",
+            "action": "rollback",
+            "application": "app1",
+            "back_up_file": "/path/to/backup/file/of/changed/file",
             "change_id": "rollback-f5b30ed9-1889-4be4-a09b-e1c198924f09",
-            "update_id": "f5b30ed9-1889-4be4-a09b-e1c198924f09",
-            "application":"app1",
-            "package_name": "/path/to/zip/file",
             "files_to_update": [
                 {
-                    "src": "",
                     "dst": "",
+                    "group_id": "",
                     "permission": "",
-                    "user_id": "",
-                    "group_id": ""
+                    "src": "",
+                    "user_id": ""
                 }
             ],
-            "back_up_file": "/path/to/backup/file/of/changed/file"
+            "package_name": "/path/to/zip/file",
+            "update_id": "f5b30ed9-1889-4be4-a09b-e1c198924f09"
         },
         {
-            "action":"apply",
+            "action": "apply",
+            "application": "app2",
             "change_id": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
-            "update_id":"ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
-            "application":"app2",
-            "package_name": "/path/to/zip/file",
+            "description": "",
             "files_to_update": [
                 {
-                    "src": "",
-                    "dst": "",
-                    "permission": "",
-                    "user_id": "",
-                    "group_id": ""
+                    "dst": "$HOME/.update/dest/sample_binary",
+                    "group": "huskypig",
+                    "permission": "742",
+                    "src": "sample_binary",
+                    "user": "huskypig"
+                },
+                {
+                    "dst": "$HOME/.update/dest/sample_config.conf",
+                    "group": "huskypig",
+                    "permission": "644",
+                    "src": "sample_config.conf",
+                    "user": "huskypig"
                 }
             ],
-            "back_up_file": "/path/to/backup/file/of/changed/file"
+            "package_name": "sample.zip",
+            "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9"
+        },
+        {
+            "action": "rollback",
+            "application": "app2",
+            "change_id": "rollback_ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+            "description": "",
+            "files_to_update": [
+                {
+                    "dst": "$HOME/.update/dest/sample_binary",
+                    "group": "huskypig",
+                    "permission": "100742",
+                    "src": "sample_binary",
+                    "user": "huskypig"
+                },
+                {
+                    "dst": "$HOME/.update/dest/sample_config.conf",
+                    "src": ""
+                }
+            ],
+            "package_name": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+            "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9"
         }
-    ]
+    ],
+    "current_change_id": "uuid of recently applied change",
+    "description": "This is a append only file, all the changes will be recorded and never deleted",
+    "id": "just random id"
 }

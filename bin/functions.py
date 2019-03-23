@@ -6,9 +6,10 @@ import os.path as path
 import utils
 import models
 import json
-from bin.listUpdate.listUpdate import UpdateLister
+from listUpdate.listUpdate import UpdateLister
 import pprint
 import argparse
+import shutil
 
 logger = None
 changelog = None
@@ -66,20 +67,25 @@ def roll_back(update_id, settings, changelog):
         change = changelog.get_change(update_id)
         roll_back_change = _roll_back(change, settings)
         changelog.apply_change(roll_back_change)
+    else:
+        print("Cannot rollback")
 
 
 def _roll_back(change, settings):
-    change_id = "rollback_"+change['update_id']
-    tmp_dir = path.join('/tmp', change_id)
+    udpate_id = change['update_id']
+    tmp_dir = path.join('/tmp', udpate_id)
     if os.path.exists(tmp_dir):
-        os.rmdir(tmp_dir)
+        shutil.rmtree(tmp_dir)
     os.mkdir(tmp_dir)
-    origin_zip = path.join(settings['back_up_dir'], change['change_id'])
+    origin_zip = path.join(utils.sanitize_path(settings['backup_dir']), change['change_id']+'.zip')
     utils.unzip_file(tmp_dir, origin_zip)
-    with open(path.join(tmp_dir, "package-info.json")) as f:
-        content = json.load(f.read())
+    pack_file = path.join(tmp_dir, "package-info.json")
+    with open(pack_file, 'r') as f:
+        content = f.read()
+    package = json.loads(content)
 
-    roll_back_change = create_roll_back_change(change, content)
+    roll_back_change = create_roll_back_change(change, package)
+    utils.backup_file(roll_back_change, settings)
     for file in roll_back_change['files_to_update']:
         utils.do_single_file_move(tmp_dir, file)
 
@@ -98,13 +104,18 @@ def create_roll_back_change(change, package_info):
         file = {}
         file['src'] = os.path.basename(up['dst'])
         file['dst'] = up['dst']
-        info = package_info_dir[file['src']]
-        file['permission'] = info['permission']
-        file['user'] = info['user']
-        file['group'] = info['group']
+        if file['src'] in package_info_dir:                   
+            info = package_info_dir[file['src']]
+            file['permission'] = info['permission']
+            file['user'] = info['user']
+            file['group'] = info['group']    
+        else:
+            # set src to '' means delete dst file
+            file['src'] = ''
+            file['dst'] = up['dst']
         files_to_update.append(file)
     roll_back_change['files_to_update'] = files_to_update
-    print(roll_back_change)
+    
     return roll_back_change
 
 
@@ -112,27 +123,37 @@ def install_update(update_id, settings, patch_info):
     """
     install updates
     """
-    change = next(
-        [change for change in patch_info.patch if change['update_id'] == update_id])
+    potential = [change for change in patch_info.patch if change['update_id'] == update_id]
+    if len(potential) <=0:
+        print_manual()
+        logger.info("Change id does not exist in patch_info")
+        return
+    change = potential[0]
+        
     change = {key:val for key, val in change.items()}
     dir_to_down = path.join('/tmp', change['update_id'])
-    utils.download_file(dir_to_down, settings, change)
 
+    utils.download_file(dir_to_down, settings, change)
     change['action'] = 'apply'
+    change['change_id'] = '{}-{}'.format(change['action'], change['update_id'])
     if changelog.appliable(change):
         __install_udpate(change, settings)
         changelog.apply_change(change)
+    else:
+        logger.info("Change is not appliable")
 
 
 def __install_udpate(change, settings):
     utils.backup_file(change, settings)
     tmp_loc = '/tmp/'+change['change_id']
+    if os.path.exists(tmp_loc):
+        shutil.rmtree(tmp_loc)
     os.mkdir(tmp_loc)
     utils.unzip_file(tmp_loc, os.path.join(
-        settings['download_dir'], change['package_name']))
+        utils.sanitize_path(settings['download_dir']), change['update_id'], change['package_name']))
     for file in change['files_to_update']:
         utils.do_single_file_move(tmp_loc, file)
-    os.removedirs(tmp_loc)
+    shutil.rmtree(tmp_loc)
 
 
 def print_manual():

@@ -3,14 +3,21 @@
         "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
         "description": "",
         "application": "app2",
-        "package_name": "/path/to/zip/file",
+        "package_name": "sample.zip",
         "files_to_update": [
             {
-                "src": "",
-                "dst": "",
-                "permission": "",
-                "user": "",
-                "group": ""
+                "src": "sample_binary",
+                "dst": "$HOME/.update/dest/sample_binary",
+                "permission": "742",
+                "user": "huskypig",
+                "group": "huskypig"
+            },
+            {
+                "src": "sample_config.conf",
+                "dst": "$HOME/.update/dest/sample_config.conf",
+                "permission": "644",
+                "user": "huskypig",
+                "group": "huskypig"
             }
         ]
     }

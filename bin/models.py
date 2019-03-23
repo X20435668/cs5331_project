@@ -33,17 +33,19 @@ class ChangeLog(object):
                 else:
                     dictionary[ele['update_id']] = ele
 
-    def can_roll_back(self, change):
-        application_name = change['application']
-        orderred_dict = self.result_changelog[application_name]
-        key = next(reversed(orderred_dict))
-        if key == change['update_id']:
-            return True
-        else:
-            return False
+    def can_roll_back(self, update_id):        
+        for _, app in self.result_changelog.items():            
+            key = next(reversed(app))
+            if key == update_id:
+                return True
+            else:
+                return False
+        return False
 
     def appliable(self, change):
         application_name = change['application']
+        if application_name not in self.result_changelog:
+            return True
         orderred_dict = self.result_changelog[application_name]
         return change['update_id'] not in orderred_dict
 
@@ -60,8 +62,11 @@ class ChangeLog(object):
 
     def apply_change(self, change):
         self._changelog['changelog'].append(change)
-        json.dump(self._changelog, self.filename)
+        with open(self.filename, 'w+') as f:
+            json.dump(self._changelog, f, indent=4,
+                      separators=(',', ': '), sort_keys=True)
         self.__build__()
+
 
 class PatchInfo(object):
     def __init__(self, data):
