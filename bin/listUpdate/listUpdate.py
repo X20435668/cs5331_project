@@ -15,18 +15,27 @@ class UpdateLister:
 
     def list_all(self):
         patch_info_new = self.get_not_applied_patch()
-        return [{key: package[key] for key in {"update_id", "version", "package_name"}} for package in
+        # Temporarily only one server
+        # client = http.client.HTTPConnection(self.server_list[0], timeout=self.timeout)
+        # client.request('GET', path)
+        # response = client.getresponse()
+        # content = response.read().decode('UTF-8')
+        # data = json.loads(content)
+        return [{key: package[key] for key in {"update_id", "version", "application"}} for package in
                 patch_info_new]
 
     def list_package_by_name(self, name):
-        path = self.compute_path(name)
+        # path = self.compute_path(name)
         # Temporarily only one server
-        client = http.client.HTTPConnection(self.server_list[0], timeout=self.timeout)
-        client.request('GET', path)
-        response = client.getresponse()
-        content = response.read().decode('UTF-8')
-        data = json.loads(content)
-        return data
+        # client = http.client.HTTPConnection(self.server_list[0], timeout=self.timeout)
+        # client.request('GET', path)
+        # response = client.getresponse()
+        # content = response.read().decode('UTF-8')
+        # data = json.loads(content)
+        patch_info_new = self.get_not_applied_patch()
+        return [{key: package[key] for key in {"update_id", "version", "application"}} for package in
+                patch_info_new if package['application'] == name]
+        return patch_info_new
 
     def get_not_applied_patch(self):
         not_patched = []
