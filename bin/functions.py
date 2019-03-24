@@ -49,15 +49,26 @@ def list_updates(args):
     """
     List updates available
     """
-    ul = UpdateLister()
-    if len(args) == 0:
+    ul = UpdateLister(patch_info=patch_info, changelog=changelog)
+    packages = []
+    if args.file is None:
         packages = ul.list_all()
-        pp = pprint.PrettyPrinter(width=1)
-        pp.pprint(packages)
+        # print()
+
+        # pp = pprint.PrettyPrinter(width=100)
+        # pp.pprint(packages)
     else:
         if args.filename:
-            ul.list_package_by_name(args.filename)
+            packages.append(ul.list_package_by_name(args.filename))
+    for package in packages:
+        package_name = package['package_name'][package['package_name'].rfind('/') + 1:]
+        __print_update_info(package_name, package, 50)
 
+
+def __print_update_info(package_name, package, length):
+    print("package_name".ljust(length), "update_id".ljust(length), "version".ljust(length))
+    print((length * 3) * "-")
+    print(package_name.ljust(length), package["update_id"].ljust(length), package["version"].ljust(length))
 
 def roll_back(update_id, settings, changelog):
     """
@@ -187,8 +198,10 @@ if __name__ == "__main__":
     patch_info = get_patch_info(cur_dir)
 
     parser = argparse.ArgumentParser(description='Rollback updater')
-    parser.add_argument('-l', '--list',
-                        help='list files can be updated')
+    sub_parser_list = parser.add_subparsers(dest='command')
+    parser_l = sub_parser_list.add_parser('list',
+                                          help='list files can be updated')
+    parser_l.add_argument('--file', dest='file', help='file name')
     parser.add_argument('-r', '--rollback',
                         help='roll back files')
     parser.add_argument('-i', '--install',
@@ -200,8 +213,8 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2 or arguments.manual:
         print_manual()
-    elif arguments.list:
-        list_updates(arguments.list)
+    elif arguments.command == 'list':
+        list_updates(arguments)
     elif arguments.rollback:
         roll_back(arguments.rollback, settings, changelog)
     elif arguments.install:

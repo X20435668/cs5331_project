@@ -58,7 +58,14 @@ class ChangeLog(object):
         return change
 
     def get_not_applied_patch(self, patch_info_list):
-        pass
+        if application_name in self.result_changelog:
+            ordered_dict = self.result_changelog[application_name]
+        else:
+            return False
+
+        latest_version = self.get_applied_latest_version(application_name)
+
+        return change['update_id'] not in ordered_dict and change['version'] > latest_version
 
     def apply_change(self, change):
         self._changelog['changelog'].append(change)
@@ -67,6 +74,12 @@ class ChangeLog(object):
                       separators=(',', ': '), sort_keys=True)
         self.__build__()
 
+    def get_applied_latest_version(self, application_name):
+        latest_version = ''
+        for key, change_log in self.result_changelog[application_name].items():
+            if latest_version < change_log['version']:
+                latest_version = change_log['version']
+        return latest_version
 
 class PatchInfo(object):
     def __init__(self, data):
