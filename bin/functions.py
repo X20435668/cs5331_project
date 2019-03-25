@@ -60,16 +60,16 @@ def list_updates(args):
     else:
         if args.file:
             packages = ul.list_package_by_name(args.file)
-        for package in packages:
-            # package_name = package['package_name'][package['package_name'].rfind('/') + 1:]
-            # __print_update_info(package_name, package, 50)
-            __print_update_info(package, 50)
+    __print_update_info(packages, 50)
 
 
-def __print_update_info(package, length):
-    print("application".ljust(length), "update_id".ljust(length), "version".ljust(length))
-    print((length * 3) * "-")
-    print(package["application"].ljust(length), package["update_id"].ljust(length), package["version"].ljust(length))
+def __print_update_info(packages, length):
+    print("application".ljust(50), "update_id".ljust(50), "version".ljust(50))
+    print((50 * 3) * "-")
+    for package in packages:
+        # package_name = package['package_name'][package['package_name'].rfind('/') + 1:]
+        # __print_update_info(package_name, package, 50)
+        print(package["application"].ljust(length), package["update_id"].ljust(length), package["version"].ljust(length))
 
 
 def roll_back(update_id, settings, changelog):
