@@ -39,6 +39,7 @@
             "application": "app2",
             "change_id": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
             "description": "",
+            "version": "1.1",
             "files_to_update": [
                 {
                     "dst": "$HOME/.update/dest/sample_binary",

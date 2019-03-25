@@ -49,14 +49,27 @@ def list_updates(args):
     """
     List updates available
     """
-    ul = UpdateLister()
-    if len(args) == 0:
+    ul = UpdateLister(patch_info=patch_info, changelog=changelog)
+    packages = []
+    if args.file is None:
         packages = ul.list_all()
-        pp = pprint.PrettyPrinter(width=1)
-        pp.pprint(packages)
+        # print()
+
+        # pp = pprint.PrettyPrinter(width=100)
+        # pp.pprint(packages)
     else:
-        if args.filename:
-            ul.list_package_by_name(args.filename)
+        if args.file:
+            packages = ul.list_package_by_name(args.file)
+        for package in packages:
+            # package_name = package['package_name'][package['package_name'].rfind('/') + 1:]
+            # __print_update_info(package_name, package, 50)
+            __print_update_info(package, 50)
+
+
+def __print_update_info(package, length):
+    print("application".ljust(length), "update_id".ljust(length), "version".ljust(length))
+    print((length * 3) * "-")
+    print(package["application"].ljust(length), package["update_id"].ljust(length), package["version"].ljust(length))
 
 
 def roll_back(update_id, settings, changelog):
@@ -77,7 +90,7 @@ def _roll_back(change, settings):
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
     os.mkdir(tmp_dir)
-    origin_zip = path.join(utils.sanitize_path(settings['backup_dir']), change['change_id']+'.zip')
+    origin_zip = path.join(utils.sanitize_path(settings['backup_dir']), change['change_id'] + '.zip')
     utils.unzip_file(tmp_dir, origin_zip)
     pack_file = path.join(tmp_dir, "package-info.json")
     with open(pack_file, 'r') as f:
@@ -90,13 +103,15 @@ def _roll_back(change, settings):
         utils.do_single_file_move(tmp_dir, file)
 
     return roll_back_change
+
+
 # package-info.json
 
 
 def create_roll_back_change(change, package_info):
     package_info_dir = {key['src']: key for key in package_info}
     roll_back_change = {key: change[key] for key in change}
-    roll_back_change['change_id'] = "rollback_"+roll_back_change['update_id']
+    roll_back_change['change_id'] = "rollback_" + roll_back_change['update_id']
     roll_back_change['action'] = 'rollback'
     roll_back_change['package_name'] = change['change_id']
     files_to_update = []
@@ -104,18 +119,18 @@ def create_roll_back_change(change, package_info):
         file = {}
         file['src'] = os.path.basename(up['dst'])
         file['dst'] = up['dst']
-        if file['src'] in package_info_dir:                   
+        if file['src'] in package_info_dir:
             info = package_info_dir[file['src']]
             file['permission'] = info['permission']
             file['user'] = info['user']
-            file['group'] = info['group']    
+            file['group'] = info['group']
         else:
             # set src to '' means delete dst file
             file['src'] = ''
             file['dst'] = up['dst']
         files_to_update.append(file)
     roll_back_change['files_to_update'] = files_to_update
-    
+
     return roll_back_change
 
 
@@ -124,13 +139,13 @@ def install_update(update_id, settings, patch_info):
     install updates
     """
     potential = [change for change in patch_info.patch if change['update_id'] == update_id]
-    if len(potential) <=0:
+    if len(potential) <= 0:
         print_manual()
         logger.info("Change id does not exist in patch_info")
         return
     change = potential[0]
-        
-    change = {key:val for key, val in change.items()}
+
+    change = {key: val for key, val in change.items()}
     dir_to_down = path.join('/tmp', change['update_id'])
 
     utils.download_file(dir_to_down, settings, change)
@@ -145,7 +160,7 @@ def install_update(update_id, settings, patch_info):
 
 def __install_udpate(change, settings):
     utils.backup_file(change, settings)
-    tmp_loc = '/tmp/'+change['change_id']
+    tmp_loc = '/tmp/' + change['change_id']
     if os.path.exists(tmp_loc):
         shutil.rmtree(tmp_loc)
     os.mkdir(tmp_loc)
@@ -187,8 +202,10 @@ if __name__ == "__main__":
     patch_info = get_patch_info(cur_dir)
 
     parser = argparse.ArgumentParser(description='Rollback updater')
-    parser.add_argument('-l', '--list',
-                        help='list files can be updated')
+    sub_parser_list = parser.add_subparsers(dest='command')
+    parser_l = sub_parser_list.add_parser('list',
+                                          help='list files can be updated')
+    parser_l.add_argument('--file', dest='file', help='file name')
     parser.add_argument('-r', '--rollback',
                         help='roll back files')
     parser.add_argument('-i', '--install',
@@ -200,8 +217,8 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2 or arguments.manual:
         print_manual()
-    elif arguments.list:
-        list_updates(arguments.list)
+    elif arguments.command == 'list':
+        list_updates(arguments)
     elif arguments.rollback:
         roll_back(arguments.rollback, settings, changelog)
     elif arguments.install:
