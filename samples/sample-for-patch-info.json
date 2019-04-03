@@ -11,16 +11,36 @@
                 "dst": "$HOME/.update/dest/sample_binary",
                 "permission": "742",
                 "user": "huskypig",
-                "group": "huskypig"
+                "group": "huskypig",
+                "is_config": false
             },
             {
                 "src": "sample_config.conf",
                 "dst": "$HOME/.update/dest/sample_config.conf",
                 "permission": "644",
                 "user": "huskypig",
-                "group": "huskypig"
+                "group": "huskypig",
+                "is_config": false
+            }
+        ]
+    },
+    {
+        "update_id": "333e505e-63bb-4470-ae52-f183fe3bc5f3",
+        "description": "Upgrading Apacher server to stop using SSLV2 and SSLV3",
+        "application": "MyRaspberryPi",
+        "package_name": "my-raspberry-pi_v1.0.zip",
+        "version": "1.0.1",
+        "files_to_update": [
+            {
+                "src": "ssl.conf",
+                "dst": "/etc/apache2/mods-available/ssl.conf",
+                "permission": "644",
+                "user": "root",
+                "group": "root",
+                "mode": "delta",
+                "delimeter": " ",
+                "is_config": true
             }
         ]
     }
-
 ]

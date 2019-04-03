@@ -10,40 +10,11 @@ from listUpdate.listUpdate import UpdateLister
 import pprint
 import argparse
 import shutil
+from logger import logger
 
-logger = None
 changelog = None
 patch_info = None
 settings = None
-
-
-def setup_log():
-    logger = logging.getLogger('updater')
-    logger.setLevel(logging.DEBUG)
-    log_dir = "../log"
-    if (not path.exists(log_dir)) or (not path.isdir(log_dir)):
-        os.mkdir(log_dir)
-    # create file handler that logs debug and higher level messages
-    fh = handlers.RotatingFileHandler(
-        path.join(log_dir, 'activity.log'), maxBytes=20 * 1024 * 1024, backupCount=5)
-    fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
-    ch = handlers.RotatingFileHandler(
-        path.join(log_dir, 'error.log'), maxBytes=20 * 1024 * 1024, backupCount=5)
-    ch.setLevel(logging.ERROR)
-    # create formatter and add it to the handlers
-    ih = logging.StreamHandler()
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    fh.setFormatter(formatter)
-    ih.setFormatter(formatter)
-    # add the handlers to logger
-    logger.addHandler(ch)
-    logger.addHandler(fh)
-    logger.addHandler(ih)
-    return logger
-
 
 def list_updates(args):
     """
@@ -105,9 +76,6 @@ def _roll_back(change, settings):
     return roll_back_change
 
 
-# package-info.json
-
-
 def create_roll_back_change(change, package_info):
     package_info_dir = {key['src']: key for key in package_info}
     roll_back_change = {key: change[key] for key in change}
@@ -159,7 +127,7 @@ def install_update(update_id, settings, patch_info):
 
 
 def __install_udpate(change, settings):
-    utils.backup_file(change, settings)
+    backup_tmp_dir = utils.backup_file(change, settings)
     tmp_loc = '/tmp/' + change['change_id']
     if os.path.exists(tmp_loc):
         shutil.rmtree(tmp_loc)
@@ -167,9 +135,9 @@ def __install_udpate(change, settings):
     utils.unzip_file(tmp_loc, os.path.join(
         utils.sanitize_path(settings['download_dir']), change['update_id'], change['package_name']))
     for file in change['files_to_update']:
-        utils.do_single_file_move(tmp_loc, file)
+        utils.do_single_file_move(tmp_loc, file, backup_tmp_dir)
     shutil.rmtree(tmp_loc)
-
+    shutil.rmtree(backup_tmp_dir)
 
 def print_manual():
     print("This is print manual")
@@ -193,11 +161,12 @@ def get_patch_info(cur_dir):
 
 
 if __name__ == "__main__":
+    logger.info("Hello world")
     cur_dir = os.path.dirname(__file__)
     with open(os.path.join(cur_dir, 'settings.json'), 'r') as f:
         content = f.read()
     settings = json.loads(content)
-    logger = setup_log()
+  
     changelog = load_change_log(os.path.join(cur_dir, '../log/changelog.json'))
     patch_info = get_patch_info(cur_dir)
 
