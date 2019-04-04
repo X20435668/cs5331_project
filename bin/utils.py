@@ -18,8 +18,7 @@ def zip_files(zip_file_name, saved_dir, files_to_zip):
 
 
 def unzip_file(tmp_dir_to_unzip, zip_file):
-    print(tmp_dir_to_unzip)
-    print(zip_file)
+    logger.info("Unzipping file [{}] to [{}]".format(zip_file, tmp_dir_to_unzip))    
     with zipfile.ZipFile(zip_file, 'r') as zipFile:
         zipFile.extractall(tmp_dir_to_unzip)
 
@@ -40,10 +39,11 @@ def backup_file(change, settings):
             obj['group'] = grp.getgrgid(st.st_gid)[0]
             obj['src'] = os.path.basename(path)
             file_list.append(obj)
+            shutil.copy(path, conf_dir)
     conf_file = os.path.join(conf_dir, "package-info.json")
     with open(conf_file, 'w+') as f:
         json.dump(file_list, f, indent=4,
-                      separators=(',', ': '), sort_keys=True)
+                  separators=(',', ': '), sort_keys=True)
     files_to_backup.append(conf_file)
     zip_files(change['change_id']+'.zip',
               sanitize_path(settings['backup_dir']), files_to_backup)
@@ -72,13 +72,14 @@ def do_single_file_move(base_dir, file, origin_tmp_dir):
             config = {}
             with open(path.join(base_dir, file['src']), 'r') as f:
                 content = f.readlines()
-            config = {line.split(delimeter)[0].strip(): delimeter.join(line.split(delimeter)[1:])) for line in content}
-            file_name=os.path.basename(dest_file)
+            config = {line.split(delimeter)[0].strip(): delimeter.join(
+                line.split(delimeter)[1:]) for line in content}
+            file_name = os.path.basename(dest_file)
             with open(path.join(origin_tmp_dir, file_name), 'r') as f:
-                content=f.readlines()
+                content = f.readlines()
             with open(dest_file, 'w+') as f:
                 for line in content:
-                    key, value=line.split(delimeter)[0], delimeter.join(
+                    key, value = line.split(delimeter)[0], delimeter.join(
                         line.split(delimeter)[1:])
                     if key.strip() in config:
                         f.write("{}{}{}\n".format(key, delimeter, config[key]))
@@ -87,8 +88,8 @@ def do_single_file_move(base_dir, file, origin_tmp_dir):
         else:
             shutil.copy(os.path.join(base_dir, file['src']), dest_file)
             os.chmod(dest_file, int(file['permission'], 8))
-            uid=pwd.getpwnam(file['user']).pw_uid
-            gid=grp.getgrnam(file['group']).gr_gid
+            uid = pwd.getpwnam(file['user']).pw_uid
+            gid = grp.getgrnam(file['group']).gr_gid
             os.chown(dest_file, uid, gid)
 
 
@@ -99,3 +100,21 @@ def download_file(dir_to_down, settings, change):
 
     shutil.copy(path.join(sanitize_path(
         settings['zip_dir']), change['package_name']), dir_to_down)
+
+
+def do_test(change, settings):
+    setting = [s['test_script'] for s in settings['test'] if s['application']]
+    try:
+        subprocess.run(
+            "python " + sanitize_path(setting[0]), shell=True, check=True)
+    except:
+        return False
+    return True
+
+def get_change_id(change, settings):
+    change_id = '{}-{}'.format(change['action'], change['update_id'])
+    file_list = os.listdir(sanitize_path(settings['backup_dir']))
+    same_name = [ f for f in file_list if change_id in f]
+    if len(same_name)>0:
+        change_id = change_id + "-" + str(len(same_name))
+    return change_id

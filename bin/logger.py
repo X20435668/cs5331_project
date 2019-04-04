@@ -6,7 +6,6 @@ import os.path as path
 import utils
 import models
 import json
-from listUpdate.listUpdate import UpdateLister
 import pprint
 import argparse
 import shutil
@@ -14,7 +13,10 @@ import shutil
 def setup_log():
     logger = logging.getLogger('updater')
     logger.setLevel(logging.DEBUG)
-    log_dir = "../log"
+    cur_dir = os.path.dirname(__file__)
+    print("cur_dir: ", cur_dir)
+    log_dir = path.join(cur_dir,"../log")
+    print("log_dir:", log_dir)
     if (not path.exists(log_dir)) or (not path.isdir(log_dir)):
         os.mkdir(log_dir)
     # create file handler that logs debug and higher level messages

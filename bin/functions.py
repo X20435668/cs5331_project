@@ -6,7 +6,7 @@ import os.path as path
 import utils
 import models
 import json
-from listUpdate.listUpdate import UpdateLister
+from listUpdate import UpdateLister
 import pprint
 import argparse
 import shutil
@@ -15,6 +15,7 @@ from logger import logger
 changelog = None
 patch_info = None
 settings = None
+
 
 def list_updates(args):
     """
@@ -40,7 +41,8 @@ def __print_update_info(packages, length):
     for package in packages:
         # package_name = package['package_name'][package['package_name'].rfind('/') + 1:]
         # __print_update_info(package_name, package, 50)
-        print(package["application"].ljust(length), package["update_id"].ljust(length), package["version"].ljust(length))
+        print(package["application"].ljust(length), package["update_id"].ljust(
+            length), package["version"].ljust(length))
 
 
 def roll_back(update_id, settings, changelog):
@@ -61,7 +63,8 @@ def _roll_back(change, settings):
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
     os.mkdir(tmp_dir)
-    origin_zip = path.join(utils.sanitize_path(settings['backup_dir']), change['change_id'] + '.zip')
+    origin_zip = path.join(utils.sanitize_path(
+        settings['backup_dir']), change['change_id'] + '.zip')
     utils.unzip_file(tmp_dir, origin_zip)
     pack_file = path.join(tmp_dir, "package-info.json")
     with open(pack_file, 'r') as f:
@@ -69,9 +72,9 @@ def _roll_back(change, settings):
     package = json.loads(content)
 
     roll_back_change = create_roll_back_change(change, package)
-    utils.backup_file(roll_back_change, settings)
+    backup_location = utils.backup_file(roll_back_change, settings)
     for file in roll_back_change['files_to_update']:
-        utils.do_single_file_move(tmp_dir, file)
+        utils.do_single_file_move(tmp_dir, file, backup_location)
 
     return roll_back_change
 
@@ -79,8 +82,8 @@ def _roll_back(change, settings):
 def create_roll_back_change(change, package_info):
     package_info_dir = {key['src']: key for key in package_info}
     roll_back_change = {key: change[key] for key in change}
-    roll_back_change['change_id'] = "rollback_" + roll_back_change['update_id']
     roll_back_change['action'] = 'rollback'
+    roll_back_change['change_id'] = utils.get_change_id(change, settings)    
     roll_back_change['package_name'] = change['change_id']
     files_to_update = []
     for up in change['files_to_update']:
@@ -106,22 +109,27 @@ def install_update(update_id, settings, patch_info):
     """
     install updates
     """
-    potential = [change for change in patch_info.patch if change['update_id'] == update_id]
+    potential = [
+        change for change in patch_info.patch if change['update_id'] == update_id]
     if len(potential) <= 0:
         print_manual()
         logger.info("Change id does not exist in patch_info")
         return
-    change = potential[0]
-
+    change = potential[0]    
     change = {key: val for key, val in change.items()}
+    change['action'] = 'apply'
+    change['change_id'] = utils.get_change_id(change, settings)
+    
     dir_to_down = path.join('/tmp', change['update_id'])
 
     utils.download_file(dir_to_down, settings, change)
-    change['action'] = 'apply'
-    change['change_id'] = '{}-{}'.format(change['action'], change['update_id'])
+    
     if changelog.appliable(change):
         __install_udpate(change, settings)
         changelog.apply_change(change)
+        success = utils.do_test(change, settings)
+        if not success:
+            roll_back(update_id, settings, changelog)
     else:
         logger.info("Change is not appliable")
 
@@ -138,6 +146,7 @@ def __install_udpate(change, settings):
         utils.do_single_file_move(tmp_loc, file, backup_tmp_dir)
     shutil.rmtree(tmp_loc)
     shutil.rmtree(backup_tmp_dir)
+
 
 def print_manual():
     print("This is print manual")
@@ -166,7 +175,7 @@ if __name__ == "__main__":
     with open(os.path.join(cur_dir, 'settings.json'), 'r') as f:
         content = f.read()
     settings = json.loads(content)
-  
+
     changelog = load_change_log(os.path.join(cur_dir, '../log/changelog.json'))
     patch_info = get_patch_info(cur_dir)
 

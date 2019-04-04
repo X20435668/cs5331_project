@@ -1,6 +1,7 @@
 import http.client
 import json
-
+import os
+import os.path as path
 
 class UpdateLister:
     def __init__(self, patch_info, changelog, timeout=5):
@@ -8,7 +9,8 @@ class UpdateLister:
         self.__server_list = []
         self.patch_info = patch_info.patch
         self.changelog = changelog
-        with open('settings.json') as settings_file:
+        cur_dir = os.path.dirname(__file__)
+        with open(path.join(cur_dir,'settings.json')) as settings_file:
             data = json.load(settings_file)
             for server in data['server_list']:
                 self.server_list.extend(server)

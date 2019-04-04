@@ -1,2 +1,9 @@
-#!/bin/bash
-python functions.py $@
+#!/usr/bin/zsh
+[ "$UID" -eq 0 ] || exec sudo zsh "$0" "$@"
+
+PATH="/home/huskypig/miniconda3/envs/py3web/bin:$PATH"
+python --version
+which python
+BASEDIR=$(dirname "$0")
+echo "$BASEDIR"
+python ${BASEDIR}/functions.py $@

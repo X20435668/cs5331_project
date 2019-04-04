@@ -33,7 +33,7 @@
         "files_to_update": [
             {
                 "src": "ssl.conf",
-                "dst": "/etc/apache2/mods-available/ssl.conf",
+                "dst": "/etc/apache2/conf-available/ssl-params.conf",
                 "permission": "644",
                 "user": "root",
                 "group": "root",
