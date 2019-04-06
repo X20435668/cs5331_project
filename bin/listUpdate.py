@@ -42,7 +42,7 @@ class UpdateLister:
     def get_not_applied_patch(self):
         not_patched = []
         for patch_info_single in self.patch_info:
-            if self.changelog.appliable(patch_info_single):
+            if self.changelog.applicable(patch_info_single):
                 not_patched.append(patch_info_single)
         return not_patched
 

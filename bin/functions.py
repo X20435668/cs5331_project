@@ -51,9 +51,9 @@ def roll_back(update_id, settings, changelog):
     roll back the previous change
     """
     logger.info("Rolling back updates: [{}]...".format(update_id))
-    logger.info("Performing validatity check...")
+    logger.info("Performing validity check...")
     if changelog.can_roll_back(update_id):
-        logger.info("The udpate id can be rollbacked.")
+        logger.info("The update id can be rollbacked.")
         logger.info("Get change from change log to rollback")
         change = changelog.get_change(update_id)
         logger.info("Change obtained from change log, performing rollback")
@@ -65,8 +65,8 @@ def roll_back(update_id, settings, changelog):
 
 
 def _roll_back(change, settings):        
-    udpate_id = change['update_id']
-    tmp_dir = path.join('/tmp', udpate_id)
+    update_id = change['update_id']
+    tmp_dir = path.join('/tmp', update_id)
     logger.info("Sanitizing [{}]".format(tmp_dir))
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
@@ -132,26 +132,26 @@ def install_update(update_id, settings, patch_info):
     install updates
     """
     logger.info("Install update::start...")
-    logger.info("getting change from udpate_id: [{}]".format(update_id))
+    logger.info("getting change from update_id: [{}]".format(update_id))
     potential = [
         change for change in patch_info.patch if change['update_id'] == update_id]
     if len(potential) <= 0:
         print_manual()
-        logger.info("Change id does not exist in patch_info")
+        logger.info("Update id does not exist in patch_info")
         return
     change = potential[0]    
     change = {key: val for key, val in change.items()}
     change['action'] = 'apply'
     change['change_id'] = utils.get_change_id(change, settings)
     
-    logger.info("checking if change is appliable")
+    logger.info("checking if change is applicable")
     if changelog.appliable(change):
         dir_to_down = path.join('/tmp', change['update_id'])
         logger.info("downloading files to [{}]".format(dir_to_down))
         utils.download_file(dir_to_down, settings, change)
         logger.info("downloading files finished")
-        logger.info("instsalling...")
-        __install_udpate(change, settings)
+        logger.info("installing...")
+        __install_update(change, settings)
         logger.info("add change to change log.")
         changelog.apply_change(change)
         logger.info("doing test")
@@ -164,7 +164,7 @@ def install_update(update_id, settings, patch_info):
         logger.info("Change is not appliable")
     logger.info("Install update::end")
 
-def __install_udpate(change, settings):
+def __install_update(change, settings):
     logger.info("Backing up files for change [{}]".format(change['change_id']))
     backup_tmp_dir = utils.backup_file(change, settings)
     logger.info("backed up file is in [{}]".format(backup_tmp_dir))    
@@ -173,7 +173,7 @@ def __install_udpate(change, settings):
     if os.path.exists(tmp_loc):
         shutil.rmtree(tmp_loc)
     os.mkdir(tmp_loc)
-    logger.info("Unziping file...")
+    logger.info("Unzipping file...")
     utils.unzip_file(tmp_loc, os.path.join(
         utils.sanitize_path(settings['download_dir']), change['update_id'], change['package_name']))
     logger.info("Unzip finished.")
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     with open(os.path.join(cur_dir, 'settings.json'), 'r') as f:
         content = f.read()
     settings = json.loads(content)
-    logger.info("setings loaded.")
+    logger.info("settings loaded.")
 
     changelog = load_change_log(os.path.join(cur_dir, '../log/changelog.json'))
     patch_info = get_patch_info(cur_dir)
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
 
     if len(sys.argv) < 2 or arguments.manual:
-        print_manual()
+        parser.print_help()
     elif arguments.command == 'list':
         list_updates(arguments)
     elif arguments.rollback:
