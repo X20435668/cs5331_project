@@ -42,12 +42,15 @@ class ChangeLog(object):
                 return False
         return False
 
-    def appliable(self, change):
+    def applicable(self, change):
         application_name = change['application']
-        if application_name not in self.result_changelog:
+        if application_name in self.result_changelog:
+            ordered_dict = self.result_changelog[application_name]
+        else:
             return True
-        orderred_dict = self.result_changelog[application_name]
-        return change['update_id'] not in orderred_dict
+
+        latest_version = self.get_applied_latest_version(application_name)
+        return change['update_id'] not in ordered_dict and change['version'] > latest_version
 
     def get_change(self, update_id):
         change = None
@@ -56,16 +59,6 @@ class ChangeLog(object):
                 change = value[update_id]
                 break
         return change
-
-    def get_not_applied_patch(self, patch_info_list):
-        if application_name in self.result_changelog:
-            ordered_dict = self.result_changelog[application_name]
-        else:
-            return False
-
-        latest_version = self.get_applied_latest_version(application_name)
-
-        return change['update_id'] not in ordered_dict and change['version'] > latest_version
 
     def apply_change(self, change):
         self._changelog['changelog'].append(change)
