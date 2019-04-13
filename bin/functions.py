@@ -145,7 +145,7 @@ def install_update(update_id, settings, patch_info):
     change['change_id'] = utils.get_change_id(change, settings)
     
     logger.info("checking if change is applicable")
-    if changelog.appliable(change):
+    if changelog.applicable(change):
         dir_to_down = path.join('/tmp', change['update_id'])
         logger.info("downloading files to [{}]".format(dir_to_down))
         utils.download_file(dir_to_down, settings, change)
