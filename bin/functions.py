@@ -127,7 +127,7 @@ def create_roll_back_change(change, package_info):
     return roll_back_change
 
 
-def install_update(update_id, settings, patch_info):
+def install_update(update_id, settings, patch_info, changelog):
     """
     install updates
     """
@@ -243,6 +243,6 @@ if __name__ == "__main__":
     elif arguments.rollback:
         roll_back(arguments.rollback, settings, changelog)
     elif arguments.install:
-        install_update(arguments.install, settings, patch_info)
+        install_update(arguments.install, settings, patch_info, changelog)
     else:
         print_manual()

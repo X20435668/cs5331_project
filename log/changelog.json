@@ -39,7 +39,6 @@
             "application": "app2",
             "change_id": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
             "description": "",
-            "version": "1.1",
             "files_to_update": [
                 {
                     "dst": "$HOME/.update/dest/sample_binary",
@@ -57,7 +56,8 @@
                 }
             ],
             "package_name": "sample.zip",
-            "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9"
+            "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+            "version": "1.1"
         },
         {
             "action": "rollback",
@@ -79,6 +79,54 @@
             ],
             "package_name": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
             "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9"
+        },
+        {
+            "action": "apply",
+            "application": "app2",
+            "change_id": "apply-ef3d7aeb-d8b9-4c53-9370-611418f1cb9-1",
+            "description": "",
+            "files_to_update": [
+                {
+                    "dst": "$HOME/.update/dest/sample_binary",
+                    "group": "huskypig",
+                    "is_config": false,
+                    "permission": "742",
+                    "src": "sample_binary",
+                    "user": "huskypig"
+                },
+                {
+                    "dst": "$HOME/.update/dest/sample_config.conf",
+                    "group": "huskypig",
+                    "is_config": false,
+                    "permission": "644",
+                    "src": "sample_config.conf",
+                    "user": "huskypig"
+                }
+            ],
+            "package_name": "sample.zip",
+            "update_id": "ef3d7aeb-d8b9-4c53-9370-611418f1cb9",
+            "version": "1.1"
+        },
+        {
+            "action": "apply",
+            "application": "MyRaspberryPi",
+            "change_id": "apply-333e505e-63bb-4470-ae52-f183fe3bc5f3-28",
+            "description": "Upgrading Apacher server to stop using SSLV2 and SSLV3",
+            "files_to_update": [
+                {
+                    "delimeter": " ",
+                    "dst": "/etc/apache2/conf-available/ssl-params.conf",
+                    "group": "root",
+                    "is_config": true,
+                    "mode": "delta",
+                    "permission": "644",
+                    "src": "ssl.conf",
+                    "user": "root"
+                }
+            ],
+            "package_name": "my-raspberry-pi_v1.0.zip",
+            "update_id": "333e505e-63bb-4470-ae52-f183fe3bc5f3",
+            "version": "1.0.1"
         }
     ],
     "current_change_id": "uuid of recently applied change",
